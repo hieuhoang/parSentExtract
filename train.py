@@ -144,6 +144,10 @@ def eval_epoch(sess, model, data_iterator, summary_writer):
 def main(_):
     assert FLAGS.source_train_path, ("--source_train_path is required.")
     assert FLAGS.target_train_path, ("--target_train_path is required.")
+    assert FLAGS.source_valid_path, ("--source_valid_path is required.")
+    assert FLAGS.target_valid_path, ("--target_valid_path is required.")
+
+
 
     # Create vocabularies.
     source_vocab_path = os.path.join(os.path.dirname(FLAGS.source_train_path),
