@@ -147,8 +147,6 @@ def main(_):
     assert FLAGS.source_valid_path, ("--source_valid_path is required.")
     assert FLAGS.target_valid_path, ("--target_valid_path is required.")
 
-
-
     # Create vocabularies.
     source_vocab_path = os.path.join(os.path.dirname(FLAGS.source_train_path),
                                      "vocabulary.source")
@@ -159,11 +157,17 @@ def main(_):
 
     # Read vocabularies.
     source_vocab, rev_source_vocab = utils.initialize_vocabulary(source_vocab_path)
+    #print("source_vocab", source_vocab)
+    #print("rev_source_vocab", rev_source_vocab)
+
     target_vocab, rev_target_vocab = utils.initialize_vocabulary(target_vocab_path)
+    #print("target_vocab", target_vocab)
 
     # Read parallel sentences.
     parallel_data = utils.read_data(FLAGS.source_train_path, FLAGS.target_train_path,
                                     source_vocab, target_vocab)
+    print("parallel_data", type(parallel_data), len(parallel_data))
+    print("parallel_data[0]", type(parallel_data[0]), len(parallel_data[0]), parallel_data[0])
 
     # Read validation data set.
     if FLAGS.source_valid_path and FLAGS.target_valid_path:

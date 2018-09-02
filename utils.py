@@ -171,6 +171,10 @@ def create_vocabulary(vocabulary_path, data_path, max_vocabulary_size):
                     vocab[word] += 1
                 else:
                     vocab[word] = 1
+        print("vocab", type(vocab), len(vocab))
+        #print("max_vocabulary_size", max_vocabulary_size)
+        #print("START_VOCAB", START_VOCAB)
+
         vocab_list = START_VOCAB + sorted(vocab, key=vocab.get, reverse=True)
         if len(vocab_list) > max_vocabulary_size:
             vocab_list = vocab_list[:max_vocabulary_size]

@@ -46,23 +46,28 @@ class BiRNN(object):
           Francis Grégoire, Philippe Langlais.
     """
     def __init__(self, config):
+        print("__init__")
         self.config = config
 
     def update_config(self, config):
+        print("update_config")
         self.config = config
 
     def build_graph(self):
         # Reset previous graph.
+        print("build_graph")
         reset_graph()
 
         # Placeholders.
         x_source = tf.placeholder(tf.int32,
                                   shape=[None, None],
                                   name="x_source")
+        print("x_source", x_source)
 
         source_seq_length = tf.placeholder(tf.int32,
                                            shape=[None],
                                            name="source_seq_length")
+        print("source_seq_length", source_seq_length)
 
         x_target = tf.placeholder(tf.int32,
                                   shape=[None, None],
@@ -181,13 +186,20 @@ class BiRNN(object):
             self.config.state_size *= 2
             # Mean and max pooling only work for 1 layer BiRNN.
             if self.config.use_mean_pooling:
+                print("use_mean_pooling")
                 source_final_state = self.average_pooling(source_rnn_outputs, source_seq_length)
                 target_final_state = self.average_pooling(target_rnn_outputs, target_seq_length)
             elif self.config.use_max_pooling:
+                print("use_max_pooling")
                 source_final_state = self.max_pooling(source_rnn_outputs)
                 target_final_state = self.max_pooling(target_rnn_outputs)
             else:
+                print("no pooling")
                 source_final_state_fw, source_final_state_bw = source_final_state
+                print("source_final_state", source_final_state)
+                print("source_final_state_fw", source_final_state_fw)
+                print("source_final_state_bw", source_final_state_bw)
+
                 target_final_state_fw, target_final_state_bw = target_final_state
                 if self.config.num_layers > 1:
                     source_final_state_fw = source_final_state_fw[-1]
