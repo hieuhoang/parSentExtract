@@ -42,7 +42,7 @@ def main(argv):
 
         cmd = 'cat /tmp/hh | ' + mosesScriptDir + '/tokenizer/tokenizer.perl -l ' + lang \
               + ' | ' + mosesScriptDir + '/tokenizer/deescape-special-chars.perl ' \
-              + ' | ' + mosesScriptDir + '/re__file__caser/truecase.perl --model training/train_truecase-model.' + lang \
+              + ' | ' + mosesScriptDir + '/recaser/truecase.perl --model training/train_truecase-model.' + lang \
               + ' > ' + extractedDir + str(nunFiles) + "." + lang
         systemCheck(cmd)
             
@@ -76,5 +76,5 @@ if __name__ == "__main__":
     #scriptDir = os.path.dirname(os.path.realpath(__file__))
     #print("scriptDir", scriptDir)
     
-    main(sys.argv[1:])
+    main(sys.argv)
 
