@@ -56,7 +56,10 @@ def main(argv):
         nunFiles += 1
 
     # extract parallel
-    cmd = 'python3 /home/hieu/workspace/github/paracrawl/parSentExtract.hieu/extract.py ' \
+    scriptDir = os.path.dirname(os.path.realpath(__file__))
+    print("scriptDir", scriptDir)
+    
+    cmd = 'python3 ' + scriptDir + '/extract.py ' \
           + '--checkpoint_dir /home/hieu/david/tflogs ' \
           + '--extract_dir /home/hieu/david/extracted ' \
           + '--source_vocab_path /home/hieu/david/training/vocabulary.source ' \
@@ -69,5 +72,8 @@ def main(argv):
     print("Finished")
 
 if __name__ == "__main__":
+    #scriptDir = os.path.dirname(os.path.realpath(__file__))
+    #print("scriptDir", scriptDir)
+    
     main(sys.argv[1:])
 
