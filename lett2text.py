@@ -16,8 +16,9 @@ def systemCheck(cmd):
 def main(argv):
     print("Starting...")
 
-    mosesScriptDir = "/home/hieu/workspace/github/mosesdecoder/scripts"
-
+    mosesScriptDir = argv[1] # /home/hieu/workspace/github/mosesdecoder/scripts
+    extractedDir = argv[2]
+    
     nunFiles = 0
     for line in sys.stdin:
     #for line in fileIn:
@@ -41,8 +42,8 @@ def main(argv):
 
         cmd = 'cat /tmp/hh | ' + mosesScriptDir + '/tokenizer/tokenizer.perl -l ' + lang \
               + ' | ' + mosesScriptDir + '/tokenizer/deescape-special-chars.perl ' \
-              + ' | ' + mosesScriptDir + '/recaser/truecase.perl --model training/train_truecase-model.' + lang \
-              + " > /home/hieu/david/extracted/" + str(nunFiles) + "." + lang
+              + ' | ' + mosesScriptDir + '/re__file__caser/truecase.perl --model training/train_truecase-model.' + lang \
+              + ' > ' + extractedDir + str(nunFiles) + "." + lang
         systemCheck(cmd)
             
         # html
@@ -60,12 +61,12 @@ def main(argv):
     print("scriptDir", scriptDir)
     
     cmd = 'python3 ' + scriptDir + '/extract.py ' \
-          + '--checkpoint_dir /home/hieu/david/tflogs ' \
-          + '--extract_dir /home/hieu/david/extracted ' \
-          + '--source_vocab_path /home/hieu/david/training/vocabulary.source ' \
-          + '--target_vocab_path /home/hieu/david/training/vocabulary.target ' \
-          + '--source_output_path t --target_output_path t2 --score_output_path t3 ' \
-          + '--source_language en  --target_language fr --decision_threshold .99'
+          + ' --checkpoint_dir /home/hieu/david/tflogs ' \
+          + ' --extract_dir ' + extractedDir \
+          + ' --source_vocab_path /home/hieu/david/training/vocabulary.source ' \
+          + ' --target_vocab_path /home/hieu/david/training/vocabulary.target ' \
+          + ' --source_output_path t --target_output_path t2 --score_output_path t3 ' \
+          + ' --source_language en  --target_language fr --decision_threshold .99'
     systemCheck(cmd)
 
 
