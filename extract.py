@@ -3,6 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 import os
+import itertools
 
 from itertools import product
 from six.moves import xrange
@@ -178,7 +179,10 @@ def main(_):
              open(FLAGS.target_output_path, mode="w", encoding="utf-8") as target_output_file,\
              open(FLAGS.score_output_path, mode="w", encoding="utf-8") as score_output_file:
 
-            for source_path, target_path in zip(source_paths, target_paths):
+            #for source_path, target_path in zip(source_paths, target_paths):
+            for source_path, target_path in itertools.product(source_paths, target_paths):
+                print("files", source_path, target_path)
+                
                 # Read sentences from articles.
                 source_sentences, target_sentences = read_articles(source_path, target_path)
 
