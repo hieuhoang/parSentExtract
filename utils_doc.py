@@ -219,6 +219,7 @@ def read_data(doc_path, source_vocab, target_vocab, max_seq_length=200):
                 source_data = sentence_to_token_ids(source, source_vocab, max_seq_length)
                 target_data = sentence_to_token_ids(target, target_vocab, max_seq_length)
                 data.append((source_data, target_data))
+
     return np.array(data, dtype=object)
 
 

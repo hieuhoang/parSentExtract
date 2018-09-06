@@ -117,8 +117,8 @@ def eval_epoch(sess, model, data_iterator, summary_writer):
     epoch_loss = 0
     for step in xrange(num_iter):
         source, target, label = data_iterator.next_batch(FLAGS.batch_size)
-        source_len = utils.sequence_length(source)
-        target_len = utils.sequence_length(target)
+        source_len = utils_doc.sequence_length(source)
+        target_len = utils_doc.sequence_length(target)
         feed_dict = {model.x_source: source,
                      model.x_target: target,
                      model.labels: label,
@@ -136,7 +136,7 @@ def eval_epoch(sess, model, data_iterator, summary_writer):
             summary = sess.run(model.summaries, feed_dict=feed_dict)
             summary_writer.add_summary(summary, global_step=data_iterator.global_step)
     epoch_loss /= step
-    epoch_f1 = utils.f1_score(epoch_precision, epoch_recall)
+    epoch_f1 = utils_doc.f1_score(epoch_precision, epoch_recall)
     print("  Testing:  Loss = {:.6f}, Accuracy = {:.4f}, "
           "Precision = {:.4f}, Recall = {:.4f}, F1 = {:.4f}"
           .format(epoch_loss, epoch_accuracy,
@@ -164,9 +164,10 @@ def main(_):
     print("parallel_data[0]", type(parallel_data[0]), len(parallel_data[0]), parallel_data[0])
 
     # Read validation data set.
-    if FLAGS.source_valid_path and FLAGS.target_valid_path:
+    if FLAGS.valid_doc_dir:
         valid_data = utils_doc.read_data(FLAGS.valid_doc_dir,
                                     source_vocab, target_vocab)
+        print("valid_data", type(valid_data), len(valid_data))
 
     # Initialize BiRNN.
     config = Config(len(source_vocab),
@@ -188,6 +189,7 @@ def main(_):
 
     # Build graph.
     model.build_graph()
+    print("graph built")
 
     # Train  model.
     with tf.Session() as sess:
@@ -195,11 +197,11 @@ def main(_):
         sess.run(tf.global_variables_initializer())
         sess.run(tf.local_variables_initializer())
 
-        train_iterator = utils.TrainingIterator(parallel_data, FLAGS.num_negative)
+        train_iterator = utils_doc.TrainingIterator(parallel_data, FLAGS.num_negative)
         train_summary_writer = tf.summary.FileWriter(os.path.join(FLAGS.checkpoint_dir, "train"), sess.graph)
 
-        if FLAGS.source_valid_path and FLAGS.target_valid_path:
-            valid_iterator = utils.EvalIterator(valid_data)
+        if FLAGS.valid_doc_dir:
+            valid_iterator = utils_doc.EvalIterator(valid_data)
             valid_summary_writer = tf.summary.FileWriter(os.path.join(FLAGS.checkpoint_dir, "valid"), sess.graph)
 
         epoch_loss = 0
@@ -213,8 +215,8 @@ def main(_):
 
         for step in xrange(num_iter):
             source, target, label = train_iterator.next_batch(FLAGS.batch_size)
-            source_len = utils.sequence_length(source)
-            target_len = utils.sequence_length(target)
+            source_len = utils_doc.sequence_length(source)
+            target_len = utils_doc.sequence_length(target)
             feed_dict = {model.x_source: source,
                          model.x_target: target,
                          model.labels: label,
@@ -241,7 +243,7 @@ def main(_):
             if train_iterator.epoch_completed > epoch_completed:
                 epoch_time = time.time() - start_time
                 epoch_loss /= batch_completed
-                epoch_f1 = utils.f1_score(epoch_precision, epoch_recall)
+                epoch_f1 = utils_doc.f1_score(epoch_precision, epoch_recall)
                 epoch_completed += 1
                 print("Epoch {} in {:.0f} sec\n"
                       "  Training: Loss = {:.6f}, Accuracy = {:.4f}, "
@@ -253,7 +255,7 @@ def main(_):
                 checkpoint_path = os.path.join(FLAGS.checkpoint_dir, "model.ckpt")
                 model.saver.save(sess, checkpoint_path, global_step=step)
                 # Evaluate model on the validation set.
-                if FLAGS.source_valid_path and FLAGS.target_valid_path:
+                if FLAGS.valid_doc_dir:
                     eval_epoch(sess, model, valid_iterator, valid_summary_writer)
                 # Initialize local variables for new epoch.
                 batch_completed = 0
