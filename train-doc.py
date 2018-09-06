@@ -14,7 +14,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
 import numpy as np
 import tensorflow as tf
 
-import utils
+import utils_doc
 from model import Config, BiRNN
 
 
@@ -150,22 +150,22 @@ def main(_):
     assert FLAGS.target_vocab_path, ("--target_vocab_path is required.")
 
     # Read vocabularies.
-    source_vocab, rev_source_vocab = utils.initialize_vocabulary(FLAGS.source_vocab_path)
+    source_vocab, rev_source_vocab = utils_doc.initialize_vocabulary(FLAGS.source_vocab_path)
     #print("source_vocab", source_vocab)
     #print("rev_source_vocab", rev_source_vocab)
 
-    target_vocab, rev_target_vocab = utils.initialize_vocabulary(FLAGS.target_vocab_path)
+    target_vocab, rev_target_vocab = utils_doc.initialize_vocabulary(FLAGS.target_vocab_path)
     #print("target_vocab", target_vocab)
 
     # Read parallel sentences.
-    parallel_data = utils.read_data(FLAGS.source_train_path, FLAGS.target_train_path,
+    parallel_data = utils_doc.read_data(FLAGS.doc_dir,
                                     source_vocab, target_vocab)
     print("parallel_data", type(parallel_data), len(parallel_data))
     print("parallel_data[0]", type(parallel_data[0]), len(parallel_data[0]), parallel_data[0])
 
     # Read validation data set.
     if FLAGS.source_valid_path and FLAGS.target_valid_path:
-        valid_data = utils.read_data(FLAGS.source_valid_path, FLAGS.target_valid_path,
+        valid_data = utils_doc.read_data(FLAGS.valid_doc_dir,
                                     source_vocab, target_vocab)
 
     # Initialize BiRNN.
