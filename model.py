@@ -197,8 +197,8 @@ class BiRNN(object):
                 print("no pooling")
                 source_final_state_fw, source_final_state_bw = source_final_state
                 print("source_final_state", source_final_state)
-                print("source_final_state_fw", source_final_state_fw)
-                print("source_final_state_bw", source_final_state_bw)
+                #print("source_final_state_fw", source_final_state_fw)
+                #print("source_final_state_bw", source_final_state_bw)
 
                 target_final_state_fw, target_final_state_bw = target_final_state
                 if self.config.num_layers > 1:
@@ -213,6 +213,8 @@ class BiRNN(object):
                     target_final_state_bw = target_final_state_bw.h
                 source_final_state = tf.concat([source_final_state_fw, source_final_state_bw],
                                                axis=1)
+                print("source_final_state", source_final_state)
+
                 target_final_state = tf.concat([target_final_state_fw, target_final_state_bw],
                                                axis=1)
 
@@ -220,6 +222,8 @@ class BiRNN(object):
         with tf.variable_scope("feed_forward"):
             h_multiply = tf.multiply(source_final_state, target_final_state)
             h_abs_diff = tf.abs(tf.subtract(source_final_state, target_final_state))
+            print("h_multiply", h_multiply)
+            print("h_abs_diff", h_abs_diff)
 
             W_1 = tf.get_variable(name="W_1",
                                   shape=[self.config.state_size, self.config.hidden_size])
