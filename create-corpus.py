@@ -14,10 +14,13 @@ def main(argv):
     inTargetHandle = open(inTargetPath, "r")
 
     docId = 0
+    totLines = 0
+    cont = True
 
-    while True:
-        numLines = random.randint(11,101)
-
+    while cont:
+        numLines = random.randint(11,300)
+        totLines += numLines
+        print(totLines)
         dir = outDir + "/" + str(docId)
         os.mkdir(dir)
 
@@ -26,6 +29,11 @@ def main(argv):
 
         for lineNum in range(numLines):
             sourceLine = inSourceHandle.readline()
+
+            if sourceLine == '':
+                cont = False
+                break
+
             targetLine = inTargetHandle.readline()
 
             #print(sourceLine)
