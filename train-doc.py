@@ -26,6 +26,14 @@ tf.flags.DEFINE_string("valid_doc_dir", "",
                        "Root path to doc dir of validation data"
                        "evaluate the model.")
 
+tf.flags.DEFINE_string("source_vocab_path", "",
+                       "Source vocab"
+                       "evaluate the model.")
+
+tf.flags.DEFINE_string("target_vocab_path", "",
+                       "Target vocab"
+                       "evaluate the model.")
+
 tf.flags.DEFINE_string("checkpoint_dir", "./tflogs-doc",
                        "Directory to save checkpoints and summaries of the model.")
 
@@ -138,21 +146,15 @@ def eval_epoch(sess, model, data_iterator, summary_writer):
 def main(_):
     assert FLAGS.doc_dir, ("--doc_dir is required.")
     assert FLAGS.valid_doc_dir, ("--valid_doc_dir is required.")
-
-    # Create vocabularies.
-    source_vocab_path = os.path.join(os.path.dirname(FLAGS.source_train_path),
-                                     "vocabulary.source")
-    target_vocab_path = os.path.join(os.path.dirname(FLAGS.source_train_path),
-                                     "vocabulary.target")
-    utils.create_vocabulary(source_vocab_path, FLAGS.source_train_path, FLAGS.source_vocab_size)
-    utils.create_vocabulary(target_vocab_path, FLAGS.target_train_path, FLAGS.target_vocab_size)
+    assert FLAGS.source_vocab_path, ("--source_vocab_path is required.")
+    assert FLAGS.target_vocab_path, ("--target_vocab_path is required.")
 
     # Read vocabularies.
-    source_vocab, rev_source_vocab = utils.initialize_vocabulary(source_vocab_path)
+    source_vocab, rev_source_vocab = utils.initialize_vocabulary(FLAGS.source_vocab_path)
     #print("source_vocab", source_vocab)
     #print("rev_source_vocab", rev_source_vocab)
 
-    target_vocab, rev_target_vocab = utils.initialize_vocabulary(target_vocab_path)
+    target_vocab, rev_target_vocab = utils.initialize_vocabulary(FLAGS.target_vocab_path)
     #print("target_vocab", target_vocab)
 
     # Read parallel sentences.
