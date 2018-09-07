@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # modifications:
 # - detect blocks of sentence pairs with high scores
 # - filter out short sentences
