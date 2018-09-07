@@ -275,10 +275,13 @@ def main(_):
                 open(FLAGS.score_output_path, mode="w", encoding="utf-8") as score_output_file:
 
             source_docs, target_docs = read_docs(FLAGS.extract_dir, source_vocab, target_vocab)
+            pairs = extract_pairs(sess, source_docs, target_docs,
+                                  source_sentences_ids, target_sentences_ids,
+                                  probs, placeholders)
 
             #for source_path, target_path in zip(source_paths, target_paths):
             for source_path, target_path in itertools.product(source_paths, target_paths):
-                print("paths", source_path, target_path)
+                #print("paths", source_path, target_path)
                 # Read sentences from articles.
                 source_sentences, target_sentences = read_articles(source_path, target_path)
 
