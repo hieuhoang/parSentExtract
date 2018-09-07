@@ -21,11 +21,11 @@ def main(argv):
         numLines = random.randint(11,300)
         totLines += numLines
         print(totLines)
-        dir = outDir + "/" + str(docId)
-        os.mkdir(dir)
+        #dir = outDir + "/" + str(docId)
+        #os.mkdir(dir)
 
-        outSourceHandle = open(dir + "/fr.txt", "w")
-        outTargetHandle = open(dir + "/en.txt", "w")
+        outSourceHandle = open(outDir + "/" + str(docId)  + ".fr", "w")
+        outTargetHandle = open(outDir + "/" + str(docId)  + ".en", "w")
 
         for lineNum in range(numLines):
             sourceLine = inSourceHandle.readline()
