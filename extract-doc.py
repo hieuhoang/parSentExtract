@@ -25,6 +25,8 @@ import utils
 
 import pprint
 
+UNK_ID = 1
+
 tf.flags.DEFINE_string("checkpoint_dir", "",
                        "Directory containing model checkpoints and meta graph.")
 
@@ -70,6 +72,44 @@ tf.flags.DEFINE_boolean("use_greedy", True,
                         "alignments.")
 
 FLAGS = tf.flags.FLAGS
+
+def sentence_to_token_ids(sentence, vocabulary):
+    """Convert a string to a list of integers representing token-ids."""
+    words = sentence.strip().split()
+    return [vocabulary.get(w, UNK_ID) for w in words]
+
+
+def read_docs(extract_dir, source_vocab, target_vocab):
+    files = os.listdir(extract_dir)
+    print("files", files)
+
+    ret_source = []
+    ret_target = []
+
+    for file in files:
+        #print("file", file)
+        if file[-3:] == ".fr" or file[-3:] == ".en":
+            if file[-3:] == ".fr":
+                #print("source")
+                vocab = source_vocab
+            elif file[-3:] == ".en":
+                #print("target")
+                vocab = target_vocab
+
+            with open(extract_dir + "/" + file, mode="r", encoding="utf-8") as handle:
+                doc_data = []
+
+                for line in handle:
+                    #print(line)
+                    sentence_data = sentence_to_token_ids(line, vocab)
+                    doc_data.append(sentence_data)
+
+                if file[-3:] == ".fr":
+                    ret_source.append(doc_data)
+                elif file[-3:] == ".en":
+                    ret_target.append(doc_data)
+
+    return ret_source, ret_target
 
 
 def read_articles(source_path, target_path):
@@ -131,47 +171,6 @@ def inference(sess, data_iterator, probs_op, placeholders):
         probs.extend(batch_probs.tolist())
     probs = np.array(probs[:data_iterator.size])
     return probs
-
-
-def extract_pairs_old(sess, source_sentences, target_sentences,
-                      source_sentences_ids, target_sentences_ids,
-                      probs_op, placeholders):
-    """Extract sentence pairs from a pair of articles in source and target languages.
-       Returns a list of (source sentence, target sentence, probability score) tuples.
-    """
-    pairs = [(i, j) for i, j in product(range(len(source_sentences)),
-                                        range(len(target_sentences)))]
-
-    data = [(source_sentences_ids[i], target_sentences_ids[j], 1.0)
-            for i, j in product(range(len(source_sentences)),
-                                range(len(target_sentences)))]
-
-    data_iterator = utils.TestingIterator(np.array(data, dtype=object))
-
-    y_score = inference(sess, data_iterator, probs_op, placeholders)
-    y_score = [(score, k) for k, score in enumerate(y_score)]
-    y_score.sort(reverse=True)
-
-    i_aligned = set()
-    j_aligned = set()
-    sentence_pairs = []
-
-    # pp = pprint.PrettyPrinter(indent=4)
-    # pp.pprint(y_score)
-
-    for score, k in y_score:
-        i, j = pairs[k]
-        print(i, j, k, score)
-        if score < FLAGS.decision_threshold or i in i_aligned or j in j_aligned:
-            continue
-        if FLAGS.use_greedy:
-            i_aligned.add(i)
-            j_aligned.add(j)
-        sentence_pairs.append((source_sentences[i], target_sentences[j], score))
-        print("ok")
-        # print(i,j,k,score)
-    return sentence_pairs
-
 
 def extract_pairs(sess, source_sentences, target_sentences,
                   source_sentences_ids, target_sentences_ids,
@@ -253,17 +252,6 @@ def main(_):
     source_vocab_words = read_vocabulary(FLAGS.source_vocab_path)
     target_vocab_words = read_vocabulary(FLAGS.target_vocab_path)
 
-    # Read source and target paths for sentence extraction.
-    source_paths = []
-    target_paths = []
-    for file in os.listdir(FLAGS.extract_dir):
-        if file.endswith(FLAGS.source_language):
-            source_paths.append(os.path.join(FLAGS.extract_dir, file))
-        elif file.endswith(FLAGS.target_language):
-            target_paths.append(os.path.join(FLAGS.extract_dir, file))
-    source_paths.sort()
-    target_paths.sort()
-
     utils.reset_graph()
     with tf.Session() as sess:
         # Restore saved model.
@@ -285,6 +273,8 @@ def main(_):
         with open(FLAGS.source_output_path, mode="w", encoding="utf-8") as source_output_file, \
                 open(FLAGS.target_output_path, mode="w", encoding="utf-8") as target_output_file, \
                 open(FLAGS.score_output_path, mode="w", encoding="utf-8") as score_output_file:
+
+            source_docs, target_docs = read_docs(FLAGS.extract_dir, source_vocab, target_vocab)
 
             #for source_path, target_path in zip(source_paths, target_paths):
             for source_path, target_path in itertools.product(source_paths, target_paths):
